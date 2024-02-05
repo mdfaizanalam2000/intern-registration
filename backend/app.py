@@ -27,7 +27,8 @@ def signup(user=Body()):
             return {"message":"email already exists, please login"}
         else:
             hashed_password=Hasher.get_password_hash(user["password"])
-            collection.insert_one({"email":user["email"],"password":hashed_password})
+            user["password"]=hashed_password
+            collection.insert_one(user)
             return {"message":"signup is successful, login to use!"}
     except Exception as e:
         return {"message":str(e)}

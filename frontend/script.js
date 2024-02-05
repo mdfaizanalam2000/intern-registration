@@ -1,6 +1,6 @@
 const loadUser = async () => {
-    const email = document.getElementById("exampleInputEmail1").value
-    const password = document.getElementById("exampleInputPassword1").value
+    const email = document.getElementById("email").value
+    const password = document.getElementById("password").value
 
     try {
         const response = await fetch("http://127.0.0.1:8000/login", {
@@ -16,7 +16,8 @@ const loadUser = async () => {
         const data = await response.json()
         alert(data.message)
         if (data.message === "login successful!") {
-            localStorage.setItem("data", JSON.stringify(data))
+            delete data.details.password
+            localStorage.setItem("data", JSON.stringify(data.details))
             window.location.href = "loginSuccess.html"
         }
     } catch (e) {
@@ -24,18 +25,28 @@ const loadUser = async () => {
     }
 }
 
-if (window.location.pathname === "/frontend/loginSuccess.html") {
-    let message = document.getElementById("message")
-    let user_data = document.getElementById("data")
+if (window.location.pathname === "/frontend/loginSuccess.html" && localStorage.getItem("data")) {
     data = JSON.parse(localStorage.getItem("data"))
-    message.innerText = `Hello ${data.details.email}, welcome to the portal. Find all your details below!`
-    user_data.innerText = JSON.stringify(data.details)
+    let name = document.getElementById("card-name")
+    let email = document.getElementById("card-email")
+    let phone = document.getElementById("card-phone")
+    let role = document.getElementById("card-role")
+
+    name.innerText = `Name: ${data.name}`
+    email.innerText = `Email: ${data.email}`
+    phone.innerText = `Phone: ${data.phone}`
+    role.innerText = `Role: ${data.role}`
+} else if (window.location.pathname === "/frontend/loginSuccess.html" && !localStorage.getItem("data")) {
+    window.location.href = "login.html"
 }
 
 const handleSignup = async () => {
-    email = document.getElementById("exampleInputEmail1").value
-    password = document.getElementById("exampleInputPassword1").value
-    cpassword = document.getElementById("exampleInputPassword2").value
+    name = document.getElementById("name").value
+    email = document.getElementById("email").value
+    phone = document.getElementById("phone").value
+    role = document.getElementById("role").value
+    password = document.getElementById("password").value
+    cpassword = document.getElementById("cpassword").value
     if (password !== cpassword)
         alert("Passwords are not matching")
     else {
@@ -46,7 +57,10 @@ const handleSignup = async () => {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
+                    "name": name,
                     "email": email,
+                    "phone": phone,
+                    "role": role,
                     "password": password
                 })
             })
@@ -57,4 +71,9 @@ const handleSignup = async () => {
             alert(e)
         }
     }
+}
+
+const handleLogout = () => {
+    localStorage.removeItem("data")
+    window.location.href = "index.html"
 }
